@@ -1,4 +1,5 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates.
+import time
 from typing import Union, Optional
 from copy import deepcopy
 import numpy as np
@@ -332,7 +333,10 @@ class InferencePipelinePointMap(InferencePipeline):
         estimate_plane=False,
     ) -> dict:
         image = self.merge_image_and_mask(image, mask)
-        with self.device: 
+        with self.device:
+            # Start inference timing
+            t_inference_start = time.time()
+
             pointmap_dict = self.compute_pointmap(image, pointmap)
             pointmap = pointmap_dict["pointmap"]
             pts = type(self)._down_sample_img(pointmap)
@@ -388,6 +392,14 @@ class InferencePipelinePointMap(InferencePipeline):
             outputs = self.decode_slat(
                 slat, self.decode_formats if decode_formats is None else decode_formats
             )
+
+            # End inference timing
+            t_inference = time.time() - t_inference_start
+            print(f"Inference time: {t_inference:.2f}s")
+
+            # Start post-process timing
+            t_postprocess_start = time.time()
+
             outputs = self.postprocess_slat_output(
                 outputs, with_mesh_postprocess, with_texture_baking, use_vertex_color
             )
@@ -413,6 +425,11 @@ class InferencePipelinePointMap(InferencePipeline):
                 )
 
             # glb.export("sample.glb")
+
+            # End post-process timing
+            t_postprocess = time.time() - t_postprocess_start
+            print(f"Post-process time: {t_postprocess:.2f}s")
+
             logger.info("Finished!")
 
             return {
