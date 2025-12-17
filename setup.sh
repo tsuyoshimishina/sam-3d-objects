@@ -53,6 +53,10 @@ pip install -e '.[p3d]'
 export PIP_FIND_LINKS="https://nvidia-kaolin.s3.us-east-2.amazonaws.com/torch-2.5.1_cu121.html"
 pip install -e '.[inference]'
 
+# Required for mesh output
+pip install --no-build-isolation git+https://github.com/NVlabs/nvdiffrast.git
+pip install --no-build-isolation git+https://github.com/graphdeco-inria/diff-gaussian-rasterization.git
+
 echo "[Step 4] Applying patches..."
 
 ./patching/hydra
