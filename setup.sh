@@ -77,4 +77,4 @@ fi
 echo ""
 echo "Setup complete!"
 echo "  conda activate $ENV_NAME"
-echo "  python demo.py"
+echo "  python demo_gradio.py"
